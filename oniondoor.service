@@ -1,0 +1,11 @@
+# This systemd service file should be stored in
+# /etc/systemd/system/oniondoor.service
+
+[Unit]
+Description=OnionDoor door opening script
+
+[Service]
+ExecStart=/usr/bin/oniondoor
+
+[Install]
+WantedBy=multi-user.target
