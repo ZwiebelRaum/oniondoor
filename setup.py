@@ -17,6 +17,8 @@ setup(
     author_email="donncha@donncha.is",
     url="https://github.com/ZwiebelRaum/oniondoor",
     license="MIT",
+    include_package_data=True,
+    zip_safe=False,
     install_requires=[
         'arrow',
         'Flask',

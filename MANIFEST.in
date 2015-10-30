@@ -1,0 +1,2 @@
+recursive-include oniondoor/templates *
+recursive-include oniondoor/static *
