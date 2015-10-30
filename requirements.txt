@@ -1,0 +1,4 @@
+arrow==0.7.0
+Flask==0.10.1
+pytimeparse==1.1.5
+RPi.GPIO==0.5.11
