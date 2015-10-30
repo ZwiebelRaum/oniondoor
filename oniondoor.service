@@ -5,7 +5,7 @@
 Description=OnionDoor door opening script
 
 [Service]
-ExecStart=/usr/bin/oniondoor
+ExecStart=/usr/local/bin/oniondoor
 
 [Install]
 WantedBy=multi-user.target

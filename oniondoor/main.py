@@ -5,7 +5,7 @@ import pytimeparse
 from flask import (Flask, flash, request, render_template, redirect,
                    url_for)
 
-from door import DoorController
+from oniondoor.door import DoorController
 
 app = Flask(__name__, instance_relative_config=True)
 # Load a config file from instance/config.py containing the app
@@ -13,6 +13,10 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
 
 door = DoorController(app)
+
+
+def main():
+    app.run()
 
 
 @app.route('/')
@@ -59,4 +63,4 @@ def deactivate():
 
 
 if __name__ == '__main__':
-    app.run()
+    main()

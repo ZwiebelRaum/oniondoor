@@ -17,7 +17,7 @@ This script uses the RPi.GPIO python library for interfacing with the
 RaspberryPi GPIO pins. This library is shipped with the current version
 of Raspbian.
 
-    sudo cp oniondoor.py /usr/bin/oniondoor
+    sudo python setup.py install
     sudo cp oniondoor.service /etc/systemd/system/oniondoor.service
     sudo systemctl enable oniondoor.service
 
