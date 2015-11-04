@@ -70,26 +70,26 @@ class DoorController(object):
         """Callback when the doorbell button is pressed"""
         if self.is_activated():
             self.app.logger.debug("Door button pressed when activated.")
-            # Unlock door if it is not currently unlocked.
-            if not self.unlocked:
-                self.unlock_door()
+            self.unlock_door()
         else:
             self.app.logger.debug("Door button pressed when not activated.")
 
     def unlock_door(self):
         """Send signal to unlock the door mechanism."""
 
-        self.app.logger.debug("Unlocking the door")
-        self.unlocked = True
+        # Unlock door if it is not currently unlocked.
+        if not self.unlocked:
+            self.app.logger.debug("Unlocking the door")
+            self.unlocked = True
 
-        # Wait a "human" delay from button press to door unlocking.
-        time.sleep(2)
+            # Wait a "human" delay from button press to door unlocking.
+            time.sleep(2)
 
-        GPIO.output(self.channel_out, GPIO.HIGH)
-        time.sleep(self.unlocked_duration)
-        GPIO.output(self.channel_out, GPIO.LOW)
+            GPIO.output(self.channel_out, GPIO.HIGH)
+            time.sleep(self.unlocked_duration)
+            GPIO.output(self.channel_out, GPIO.LOW)
 
-        self.unlocked = False
+            self.unlocked = False
 
     def clean_up(self):
         GPIO.cleanup()
