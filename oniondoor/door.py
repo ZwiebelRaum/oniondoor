@@ -6,6 +6,63 @@ import arrow
 import RPi.GPIO as GPIO
 
 
+class SecretHandshake(object):
+    """
+    Track the current state of a buzzer "secret handshake" attempt.
+
+    Holding the buzzer send a signal to the RPi approximately once every 5
+    seconds. To unlock the door the button should be pressed once,
+    then pressed again during the 3rd five second time period.
+
+    Presses outside of this time period will reset the handshake state. This
+    process should reduce the likelihood of someone accidentally opening the
+    door by repeatedly pressing the buzzer.
+
+
+    0 sec          5 sec          10 sec         15 sec         20 sec
+    |**************|**************|--------------|**************|
+    ^                             ^              ^
+    Initial                        --- Active ---
+    """
+
+    # Handshake States
+    START = 0
+    WAITING = 1
+
+    def __init__(self, app, action):
+        """Action is the callable to run when the handshake is successful"""
+        self.app = app
+        self.activate = action
+        self.event_time = 0
+        self.state = self.START
+
+    def shake_event(self):
+        """Got a new shake event (e.g someone pressed the buzzer)"""
+
+        if self.state == self.START:
+            # After first event, go into the waiting state
+            self.state = self.WAITING
+            self.event_time = time.time()
+            return None
+
+        elif self.state == self.WAITING:
+            # The second shake event should be in the 3 period (10-15 seconds)
+            time_elapsed = time.time() - self.event_time
+            if time_elapsed >= 10 and time_elapsed <= 15:
+                self.app.logger.info('Successful handshake')
+                self.activate()
+
+            # Second shake event was outside the third period
+            else:
+                self.app.logger.debug('Failed handshake after %d seconds',
+                                      time_elapsed)
+
+            # Reset the handshake state now regardless of the outcome
+            self.event_time = 0
+            self.state = self.START
+            return None
+
+
 class DoorController(object):
     """Controller object to manage the door interface"""
 
@@ -26,6 +83,9 @@ class DoorController(object):
 
         self.unlocked = False
         self.unlocked_duration = 3  # Open door for 3 seconds
+
+        # Object which tracks the progress of the "handshake"
+        self.handshake = SecretHandshake(app, action=self.unlock_door)
 
         GPIO.setmode(GPIO.BOARD)
 
@@ -68,11 +128,16 @@ class DoorController(object):
 
     def button_pressed(self, channel):
         """Callback when the doorbell button is pressed"""
+
+        # If the door is activated, unlock immediately
         if self.is_activated():
             self.app.logger.debug("Door button pressed when activated.")
             self.unlock_door()
+
         else:
+            # Otherwise update the state of the handshake with this new event
             self.app.logger.debug("Door button pressed when not activated.")
+            self.handshake.shake_event()
 
     def unlock_door(self):
         """Send signal to unlock the door mechanism."""
