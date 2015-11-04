@@ -21,6 +21,13 @@ of Raspbian.
     sudo cp oniondoor.service /etc/systemd/system/oniondoor.service
     sudo systemctl enable oniondoor.service
 
+Tor should be configured to forward http traffic to the webserver on
+port 5000. iptables rules need to be configured to forward local requests
+on port 80.
+
+    iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 5000
+    iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-ports 5000
+
 
 RaspberryPi Pinout
 ------------------
