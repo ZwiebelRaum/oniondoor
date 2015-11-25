@@ -87,6 +87,7 @@ class DoorController(object):
         # Object which tracks the progress of the "handshake"
         self.handshake = SecretHandshake(app, action=self.unlock_door)
 
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
 
         # Set input pin hign for pull-down signaling
