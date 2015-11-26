@@ -8,6 +8,7 @@ from flask import (Flask, flash, request, render_template, redirect,
                    url_for)
 
 from oniondoor.door import DoorController
+from oniondoor.fritz import FritzWLAN
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['LOG_FILE_LOCATION'] = '/var/log/oniondoor.log'
@@ -16,17 +17,30 @@ app.config['LOG_FILE_LOCATION'] = '/var/log/oniondoor.log'
 # secret key: SECRET_KEY='<SECRET_KEY>'
 app.config.from_pyfile('config.py')
 
-file_handler = RotatingFileHandler(app.config['LOG_FILE_LOCATION'])
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s [%(levelname)s]: "
-                                            "%(message)s"))
-app.logger.addHandler(file_handler)
-app.logger.setLevel(logging.DEBUG)
-
 door = DoorController(app)
 
 
 def main():
+    app.logger.info("Starting OnionDoor")
+
+    # Configure log file
+    file_handler = RotatingFileHandler(app.config['LOG_FILE_LOCATION'])
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s "
+                                                "[%(levelname)s]: "
+                                                "%(message)s"))
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.DEBUG)
+
+    # Configure connection to the FritzBox
+    try:
+        app.fritz = FritzWLAN(password=app.config.get('FRITZ_PASSWORD', ''))
+        app.logger.debug("%d devices associated to the WLAN.",
+                         app.fritz.associated_devices)
+    except KeyError:
+        app.logger.exception("Error with FritzBox connection, is the password "
+                             "configured correctly?")
+
     app.run()
 
 
