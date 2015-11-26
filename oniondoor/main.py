@@ -21,7 +21,6 @@ door = DoorController(app)
 
 
 def main():
-    app.logger.info("Starting OnionDoor")
 
     # Configure log file
     file_handler = RotatingFileHandler(app.config['LOG_FILE_LOCATION'])
@@ -31,6 +30,8 @@ def main():
                                                 "%(message)s"))
     app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.DEBUG)
+
+    app.logger.info("Starting OnionDoor")
 
     # Configure connection to the FritzBox
     try:
