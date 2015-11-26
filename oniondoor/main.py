@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import logging
+from logging.handlers import RotatingFileHandler
 
 import pytimeparse
 from flask import (Flask, flash, request, render_template, redirect,
@@ -9,16 +10,18 @@ from flask import (Flask, flash, request, render_template, redirect,
 from oniondoor.door import DoorController
 
 app = Flask(__name__, instance_relative_config=True)
+app.config['LOG_FILE_LOCATION'] = '/var/log/oniondoor.log'
 
 # Load a config file from instance/config.py containing the app
 # secret key: SECRET_KEY='<SECRET_KEY>'
 app.config.from_pyfile('config.py')
 
-if not app.debug:
-    file_handler = logging.RotatingFileHandler('oniondoor.log')
-    file_handler.setLevel(logging.DEBUG)
-    app.logger.addHandler(file_handler)
-    app.logger.setLevel(logging.DEBUG)
+file_handler = RotatingFileHandler(app.config['LOG_FILE_LOCATION'])
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s [%(levelname)s]: "
+                                            "%(message)s"))
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.DEBUG)
 
 door = DoorController(app)
 
