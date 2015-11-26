@@ -8,6 +8,7 @@ from flask import (Flask, flash, request, render_template, redirect,
                    url_for)
 
 from oniondoor.door import DoorController
+from oniondoor.fritz import FritzWLAN
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['LOG_FILE_LOCATION'] = '/var/log/oniondoor.log'
@@ -24,6 +25,7 @@ app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.DEBUG)
 
 door = DoorController(app)
+app.fritz = FritzWLAN(password=app.config['FRITZ_PASSWORD'])
 
 
 def main():

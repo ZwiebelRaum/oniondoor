@@ -127,11 +127,21 @@ class DoorController(object):
                 self.activate_until = False
                 return False
 
+    def is_office_occupied(self):
+        """Unlock if devices are associated on the WLAN"""
+
+        num_devices = self.app.fritz.association_numbers
+        if num_devices > self.app.config.FRITZ_BASELINE:
+            self.app.logger.debug("%d devices on the WLAN", num_devices)
+            return True
+        else:
+            return False
+
     def button_pressed(self, channel):
         """Callback when the doorbell button is pressed"""
 
         # If the door is activated, unlock immediately
-        if self.is_activated():
+        if self.is_office_occupied() or self.is_activated():
             self.app.logger.debug("Door button pressed when activated.")
             self.unlock_door()
 
