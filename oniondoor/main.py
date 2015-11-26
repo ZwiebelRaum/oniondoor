@@ -8,6 +8,7 @@ from flask import (Flask, flash, request, render_template, redirect,
                    url_for)
 
 from oniondoor.door import DoorController
+from oniondoor.fritz import FritzWLAN
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['LOG_FILE_LOCATION'] = '/var/log/oniondoor.log'
@@ -25,8 +26,18 @@ app.logger.setLevel(logging.DEBUG)
 
 door = DoorController(app)
 
+# Configure connection to the FritzBox
+try:
+    app.fritz = FritzWLAN(password=app.config.get('FRITZ_PASSWORD', ''))
+    app.logger.debug("%d devices associated to the WLAN.",
+                     app.fritz.associated_devices)
+except KeyError:
+    app.logger.exception("Error with FritzBox connection, is the password "
+                         "configured correctly?")
+
 
 def main():
+    app.logger.info("Starting OnionDoor")
     app.run()
 
 

@@ -24,5 +24,6 @@ setup(
         'Flask',
         'pytimeparse',
         'RPi.GPIO',
+        'fritzconnection',
     ],
 )
