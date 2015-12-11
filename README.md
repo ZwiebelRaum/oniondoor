@@ -1,7 +1,7 @@
 OnionDoor
 =========
 
-The OnionDoor script runs on a RaspberryPi in the Berlin ZweibelRaum
+The OnionDoor script runs on a RaspberryPi in the Berlin ZwiebelRaum
 office. Currently the script simply opens the door in response to a
 buzzer press. A more complex access control policy is planned for the
 future.
@@ -22,7 +22,7 @@ of Raspbian.
     sudo systemctl enable oniondoor.service
 
 Tor should be configured to forward http traffic to the webserver on
-port 5000. iptables rules need to be configured to forward local requests
+port 5000. Iptables rules need to be configured to forward local requests
 on port 80.
 
     iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 5000
@@ -42,4 +42,4 @@ RaspberryPi Pinout
 Circuit Schematic
 -----------------
 
-TOOD
+TODO
