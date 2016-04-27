@@ -140,7 +140,7 @@ class DoorController(object):
         """Callback when the doorbell button is pressed"""
 
         # If the door is activated, unlock immediately
-        if self.is_office_occupied() or self.is_activated():
+        if self.is_activated() or self.is_office_occupied():
             self.app.logger.debug("Door button pressed when activated.")
             self.unlock_door()
 
