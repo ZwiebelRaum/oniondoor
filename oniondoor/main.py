@@ -2,8 +2,10 @@
 from __future__ import absolute_import
 import logging
 from logging.handlers import RotatingFileHandler
+import datetime
 
 import pytimeparse
+import arrow
 from flask import (Flask, flash, request, render_template, redirect,
                    url_for)
 
@@ -68,14 +70,17 @@ def activate():
 
     time_period = request.args.get('time')
     time_seconds = pytimeparse.parse(str(time_period))
+    new_active_until = arrow.now() + datetime.timedelta(seconds=time_seconds)
 
     if not time_seconds or time_seconds <= 0:
-        time_seconds = 2 * 60  # Default activation period of 2 minutes
         flash(u'Invalid time period provided', 'danger')
-    else:
-        flash(u'Door activated!', 'success')
 
-    door.activate(time_seconds=time_seconds)
+    elif door.active_until and (new_active_until < door.active_until):
+        flash(u'Cannot set a shorter activation period without first deactivating', 'danger')
+
+    else:
+        door.activate(active_until=new_active_until)
+        flash(u'Door activated!', 'success')
 
     return redirect(url_for('index'))
 

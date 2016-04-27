@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import time
-import datetime
 import arrow
 
 import RPi.GPIO as GPIO
@@ -98,10 +97,11 @@ class DoorController(object):
         GPIO.add_event_detect(self.channel_in, GPIO.FALLING,
                               callback=self.button_pressed, bouncetime=200)
 
-    def activate(self, time_seconds=0):
-        """Activate the door unlock mechanism for `time_period` seconds"""
-        self.active_until = (arrow.now() +
-                             datetime.timedelta(seconds=time_seconds))
+    def activate(self, active_until):
+        """
+        Activate the door unlock mechanism until timestamp
+        """
+        self.active_until = active_until
         self.app.logger.debug("Door activated until {}".format(
                               self.active_until))
 
