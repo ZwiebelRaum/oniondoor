@@ -84,6 +84,8 @@ class DoorController(object):
         self.unlocked = False
         self.unlocked_duration = 3  # Open door for 3 seconds
 
+        self.bounce_time = app.config.get('BOUNCE_TIME', 200)
+
         # Object which tracks the progress of the "handshake"
         if self.app.config.get('ENABLE_HANDSHAKE'):
             self.handshake = SecretHandshake(app, action=self.unlock_door)
@@ -99,7 +101,8 @@ class DoorController(object):
         # Set output pin low for pull-up signaling
         GPIO.setup(self.channel_out, GPIO.OUT, initial=GPIO.LOW)
         GPIO.add_event_detect(self.channel_in, GPIO.FALLING,
-                              callback=self.button_pressed, bouncetime=200)
+                              callback=self.button_pressed,
+                              bouncetime=self.bounce_time)
 
     def activate(self, time_seconds=0):
         """Activate the door unlock mechanism for `time_period` seconds"""
