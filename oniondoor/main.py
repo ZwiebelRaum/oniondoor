@@ -34,13 +34,14 @@ def main():
     app.logger.info("Starting OnionDoor")
 
     # Configure connection to the FritzBox
-    try:
-        app.fritz = FritzWLAN(password=app.config.get('FRITZ_PASSWORD', ''))
-        app.logger.debug("%d devices associated to the WLAN.",
-                         app.fritz.associated_devices)
-    except KeyError:
-        app.logger.exception("Error with FritzBox connection, is the password "
-                             "configured correctly?")
+    if app.config.get('ENABLE_FRITZ'):
+        try:
+            app.fritz = FritzWLAN(password=app.config.get('FRITZ_PASSWORD', ''))
+            app.logger.debug("%d devices associated to the WLAN.",
+                             app.fritz.associated_devices)
+        except KeyError:
+            app.logger.exception("Error with FritzBox connection, is the password "
+                                 "configured correctly?")
 
     app.run()
 

@@ -85,7 +85,10 @@ class DoorController(object):
         self.unlocked_duration = 3  # Open door for 3 seconds
 
         # Object which tracks the progress of the "handshake"
-        self.handshake = SecretHandshake(app, action=self.unlock_door)
+        if self.app.config.get('ENABLE_HANDSHAKE'):
+            self.handshake = SecretHandshake(app, action=self.unlock_door)
+        else:
+            self.handshake = None
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
@@ -129,6 +132,11 @@ class DoorController(object):
 
     def is_office_occupied(self):
         """Unlock if devices are associated on the WLAN"""
+
+        # XXX: This isn't working. Disable this functionality for now.
+        if not self.app.config.get('ENABLE_FRITZ'):
+            return False
+
         if self.app.fritz.associated_devices > self.app.config.FRITZ_BASELINE:
             self.app.logger.debug("%d devices on the WLAN, opening!",
                                   self.app.fritz.associated_devices)
@@ -147,7 +155,8 @@ class DoorController(object):
         else:
             # Otherwise update the state of the handshake with this new event
             self.app.logger.debug("Door button pressed when not activated.")
-            self.handshake.shake_event()
+            if self.handshake:
+                self.handshake.shake_event()
 
     def unlock_door(self):
         """Send signal to unlock the door mechanism."""
