@@ -151,12 +151,6 @@ class DoorController(object):
     def button_pressed(self, channel):
         """Callback when the doorbell button is pressed"""
 
-        # Try filter out false-positives due to noise on the input
-        time.sleep(0.01)
-        if GPIO.input(channel) != GPIO.LOW:
-            self.app.logger.debug("Input no longer low, might be a false positive.")
-            return
-
         # If the door is activated, unlock immediately
         if self.is_activated() or self.is_office_occupied():
             self.app.logger.debug("Door button pressed when activated.")
