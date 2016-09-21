@@ -99,8 +99,8 @@ class DoorController(object):
         # Set input pin hign for pull-down signaling
         GPIO.setup(self.channel_in, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-        # Set output pin low for pull-up signaling
-        GPIO.setup(self.channel_out, GPIO.OUT, initial=GPIO.LOW)
+        # Set output pin high, relay activates when pin goes low.
+        GPIO.setup(self.channel_out, GPIO.OUT, initial=GPIO.HIGH)
         GPIO.add_event_detect(self.channel_in, GPIO.FALLING,
                               callback=self.button_pressed,
                               bouncetime=self.bounce_time)
