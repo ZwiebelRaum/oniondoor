@@ -43,7 +43,7 @@ def main():
             app.logger.exception("Error with FritzBox connection, is the password "
                                  "configured correctly?")
 
-    app.run()
+    app.run(use_reloader=False)
 
 
 @app.route('/')
