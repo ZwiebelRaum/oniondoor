@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from threading import Thread
 import time
 import datetime
 import arrow
@@ -161,23 +162,31 @@ class DoorController(object):
             if self.handshake:
                 self.handshake.shake_event()
 
+    def unlock_door_async(self):
+        """
+        Perform the slow unlock and lock in a separate thread
+        """
+        self.app.logger.debug("Unlocking the door")
+        self.unlocked = True
+
+        # Wait a "human" delay from button press to door unlocking.
+        time.sleep(2)
+
+        GPIO.output(self.channel_out, GPIO.LOW)
+        time.sleep(self.unlocked_duration)
+        GPIO.output(self.channel_out, GPIO.HIGH)
+
+        self.app.logger.debug("Locking the door")
+        self.unlocked = False
+
     def unlock_door(self):
         """Send signal to unlock the door mechanism."""
 
         # Unlock door if it is not currently unlocked.
         if not self.unlocked:
-            self.app.logger.debug("Unlocking the door")
-            self.unlocked = True
-
-            # Wait a "human" delay from button press to door unlocking.
-            time.sleep(2)
-
-            GPIO.output(self.channel_out, GPIO.HIGH)
-            time.sleep(self.unlocked_duration)
-            GPIO.output(self.channel_out, GPIO.LOW)
-
-            self.app.logger.debug("Locking the door")
-            self.unlocked = False
+            # Perform the unlock in a separate thread to avoid stalling the main
+            # Flask thread.
+            Thread(target=self.unlock_door_async).start()
 
     def clean_up(self):
         GPIO.cleanup()
