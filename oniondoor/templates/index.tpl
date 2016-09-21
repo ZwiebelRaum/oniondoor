@@ -28,7 +28,7 @@
       </div>
       {% endif %}
       <div class="row span6 offset3">
-        <form class="form-inline" method="GET" action="{{ url_for('activate') }}">
+        <form class="form-inline" method="POST" action="{{ url_for('activate') }}">
           {% if not activated %}
           <div class="form-group">
             <label class="sr-only" for="unlocktime">Unlock period</label>

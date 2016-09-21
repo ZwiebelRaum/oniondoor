@@ -59,7 +59,7 @@ def index():
                                activated=False)
 
 
-@app.route('/activate', methods=['GET'])
+@app.route('/activate', methods=['POST'])
 def activate():
     """Endpoint to activate the door system
 
@@ -67,7 +67,7 @@ def activate():
     parse the provided time period and activate for that period of time.
     """
 
-    time_period = request.args.get('time')
+    time_period = request.form.get('time')
     time_seconds = pytimeparse.parse(str(time_period))
 
     if not time_seconds or time_seconds <= 0:
