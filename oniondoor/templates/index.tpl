@@ -42,6 +42,11 @@
           {% if activated %}<a href="{{ url_for('deactivate') }}" class="btn btn-danger btn-lg">Deactivate</a>{% endif %}
         </form>
       </div>
+      {% if config.HS_HOSTNAME %}
+      <div class="row span6 offset3" style="margin-top: 20px">
+          <div class="panel panel-default"><div class="panel-body">Service is listening on hidden service <a href="http://{{ config.HS_HOSTNAME }}">{{ config.HS_HOSTNAME }}</a>
+          </div></div>
+      </div>{% endif %}
     </div> <!-- /container -->
   </body>
 </html>
