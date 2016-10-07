@@ -87,6 +87,9 @@ class DoorController(object):
 
         self.bounce_time = app.config.get('BOUNCE_TIME', 200)
 
+        # Configure if the RPi should read state from the external door button
+        self.use_door_button = self.app.config.get('ENABLE_DOOR_BUTTON', False)
+
         # Object which tracks the progress of the "handshake"
         if self.app.config.get('ENABLE_HANDSHAKE'):
             self.handshake = SecretHandshake(app, action=self.unlock_door)
@@ -152,15 +155,16 @@ class DoorController(object):
         """Callback when the doorbell button is pressed"""
 
         # If the door is activated, unlock immediately
-        if self.is_activated() or self.is_office_occupied():
-            self.app.logger.debug("Door button pressed when activated.")
-            self.unlock_door()
+        if self.use_door_button:
+            if self.is_activated() or self.is_office_occupied():
+                self.app.logger.debug("Door button pressed when activated.")
+                self.unlock_door()
 
-        else:
-            # Otherwise update the state of the handshake with this new event
-            self.app.logger.debug("Door button pressed when not activated.")
-            if self.handshake:
-                self.handshake.shake_event()
+            else:
+                # Otherwise update the state of the handshake with this new event
+                self.app.logger.debug("Door button pressed when not activated.")
+                if self.handshake:
+                    self.handshake.shake_event()
 
     def unlock_door_async(self):
         """
@@ -170,7 +174,7 @@ class DoorController(object):
         self.unlocked = True
 
         # Wait a "human" delay from button press to door unlocking.
-        time.sleep(2)
+        time.sleep(1)
 
         GPIO.output(self.channel_out, GPIO.LOW)
         time.sleep(self.unlocked_duration)

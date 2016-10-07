@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 
 import pytimeparse
 from flask import (Flask, flash, request, render_template, redirect,
-                   url_for)
+                   url_for, abort)
 
 from oniondoor.door import DoorController
 from oniondoor.fritz import FritzWLAN
@@ -57,6 +57,19 @@ def index():
     else:
         return render_template('index.tpl',
                                activated=False)
+
+
+@app.route('/<key>')
+def manual_open(key):
+    """
+    Endpoint for manually unlocking the door with the need to press the door button
+    """
+    if key == app.config.get("UNLOCK_ENDPOINT", "open"):
+        door.unlock_door()
+        flash("Unlocking the door", 'success')
+        return redirect(url_for('index'))
+    else:
+        abort(404)
 
 
 @app.route('/activate', methods=['POST'])
